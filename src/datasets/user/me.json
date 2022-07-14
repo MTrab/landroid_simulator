@@ -1,0 +1,19 @@
+{
+    "id":403442,
+    "email":"christian@trab.dk",
+    "name":"Christian",
+    "surname":"Trab",
+    "user_type":"customer",
+    "locale":"da",
+    "push_notifications":true,
+    "location":"None",
+    "terms_of_use_agreed":true,
+    "marketing_consent":false,
+    "profiling_consent":false,
+    "advertising_consent":"None",
+    "country_id":208,
+    "mqtt_endpoint":"a1optpg91s0ydf-ats.iot.eu-west-1.amazonaws.com",
+    "actions_on_google_pin_code":"None",
+    "created_at":"2021-04-18 10:40:37",
+    "updated_at":"2021-04-18 10:51:25"
+ }
