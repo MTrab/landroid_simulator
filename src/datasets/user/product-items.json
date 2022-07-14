@@ -1,131 +1,117 @@
 [
     {
-       "id":124371,
-       "product_id":24,
-       "user_id":403442,
-       "serial_number":"2018301737010002069C",
-       "mac_address":"F0FE6B83B4A8",
-       "name":"Robert",
-       "locked":true,
-       "firmware_version":3.52,
-       "firmware_auto_upgrade":true,
-       "push_notifications":true,
-       "sim":"None",
-       "push_notifications_level":"warning",
-       "test":false,
-       "iot_registered":true,
-       "mqtt_registered":true,
-       "pin_code":"None",
-       "registered_at":"2018-04-26 00:00:00",
-       "online":true,
-       "app_settings":"None",
-       "accessories":"None",
-       "features":{
-          "chassis":"s_2017",
-          "display_type":"led",
-          "input_type":"keyboard_led",
-          "lock":true,
-          "mqtt":true,
-          "multi_zone":true,
-          "multi_zone_percentage":true,
-          "multi_zone_zones":4,
-          "rain_delay":true,
-          "unrestricted_mowing_time":true,
-          "wifi_pairing":"smartlink"
-       },
-       "pending_radio_link_validation":"None",
-       "mqtt_endpoint":"iot.eu-west-1.worxlandroid.com",
-       "mqtt_topics":{
-          "command_in":"DB510/F0FE6B83B4A8/commandIn",
-          "command_out":"DB510/F0FE6B83B4A8/commandOut"
-       },
-       "warranty_registered":true,
-       "purchased_at":"2018-04-20 00:00:00",
-       "warranty_expires_at":"2021-04-20 00:00:00",
-       "setup_location":{
-          "latitude":55.99521333333334,
-          "longitude":9.880373333333333
-       },
-       "city":{
-          "id":2613887,
-          "country_id":208,
-          "name":"Skanderborg",
-          "latitude":56.039909,
-          "longitude":9.9272,
-          "created_at":"2018-02-15 22:41:43",
-          "updated_at":"2018-02-15 22:41:43"
-       },
-       "time_zone":"Europe/Copenhagen",
-       "lawn_size":354.61145019531,
-       "lawn_perimeter":"None",
-       "auto_schedule_settings":{
-          "boost":0,
-          "nutrition":"None",
-          "irrigation":"None",
-          "soil_type":"None",
-          "grass_type":"None",
-          "exclusion_scheduler":{
-             "exclude_nights":true,
-             "days":[
-                {
-                   "exclude_day":false,
-                   "slots":[
-
-                   ]
-                },
-                {
-                   "exclude_day":false,
-                   "slots":[
-
-                   ]
-                },
-                {
-                   "exclude_day":false,
-                   "slots":[
-
-                   ]
-                },
-                {
-                   "exclude_day":false,
-                   "slots":[
-
-                   ]
-                },
-                {
-                   "exclude_day":false,
-                   "slots":[
-
-                   ]
-                },
-                {
-                   "exclude_day":false,
-                   "slots":[
-
-                   ]
-                },
-                {
-                   "exclude_day":false,
-                   "slots":[
-
-                   ]
-                }
-             ]
-          }
-       },
-       "auto_schedule":false,
-       "distance_covered":1909561,
-       "mower_work_time":115134,
-       "blade_work_time":100325,
-       "blade_work_time_reset":90439,
-       "blade_work_time_reset_at":"2022-04-25 08:05:54",
-       "battery_charge_cycles":2839,
-       "battery_charge_cycles_reset":"None",
-       "battery_charge_cycles_reset_at":"None",
-       "messages_in":834,
-       "messages_out":128425,
-       "raw_messages_in":36227,
-       "raw_messages_out":128425,
-       "created_at":"2018-02-06 17:45:04",
-       "updated_at":"2022-07-14 00:30:48"
+        "id":$iid,
+        "product_id":$pid,
+        "user_id":$uid,
+        "serial_number":$serial,
+        "mac_address":$mac,
+        "name":$name,
+        "locked":$locked,
+        "firmware_version":$fw_version,
+        "firmware_auto_upgrade":$fw_autoupgrade,
+        "push_notifications":$notifications,
+        "sim":$sim,
+        "push_notifications_level":$notifications_level,
+        "test": false,
+        "iot_registered":$is_iot,
+        "mqtt_registered":$is_mqtt,
+        "pin_code":$pin,
+        "registered_at":$registered_at,
+        "online":$online,
+        "app_settings": "None",
+        "accessories":$accessories,
+        "features": {
+            "chassis":$prod_chassis,
+            "display_type":$prod_display_type,
+            "input_type":$prod_input_type,
+            "lock":$prod_lock,
+            "mqtt":$prod_mqtt,
+            "multi_zone":$prod_multi_zone,
+            "multi_zone_percentage":$prod_multi_zone_percentage,
+            "multi_zone_zones":$prod_multi_zone_zones,
+            "rain_delay":$prod_rain_delay,
+            "unrestricted_mowing_time":$prod_unrestricted_mowing_time,
+            "wifi_pairing":$prod_wifi_pairing
+        },
+        "pending_radio_link_validation":$pending_radio_link_validation,
+        "mqtt_endpoint": "landroid_sim.trab.dk",
+        "mqtt_topics": {
+            "command_in": "$board/$mac/commandIn",
+            "command_out": "$board/$mac/commandOut"
+        },
+        "warranty_registered":$warranty_registered,
+        "purchased_at":$purchased_at,
+        "warranty_expires_at":$warranty_expires_at,
+        "setup_location": {
+            "latitude":$setup_lat,
+            "longitude":$setup_lon
+        },
+        "city": {
+            "id":$city_id,
+            "country_id":$country_id,
+            "name":$city_name,
+            "latitude":$city_lat,
+            "longitude":$city_lon,
+            "created_at":$city_created_at,
+            "updated_at":$city_updated_at
+        },
+        "time_zone":$tz,
+        "lawn_size":$lawn_size,
+        "lawn_perimeter":$lawn_perimeter,
+        "auto_schedule_settings": {
+            "boost":$sch_boost,
+            "nutrition":$sch_nutrition,
+            "irrigation":$sch_irrigation,
+            "soil_type":$sch_soil_type,
+            "grass_type":$sch_grass_type,
+            "exclusion_scheduler": {
+                "exclude_nights":$sch_exclude_night,
+                "days": [
+                    {
+                        "exclude_day":$sch_exclude_day_0,
+                        "slots": []
+                    },
+                    {
+                        "exclude_day":$sch_exclude_day_1,
+                        "slots": []
+                    },
+                    {
+                        "exclude_day":$sch_exclude_day_2,
+                        "slots": []
+                    },
+                    {
+                        "exclude_day":$sch_exclude_day_3,
+                        "slots": []
+                    },
+                    {
+                        "exclude_day":$sch_exclude_day_4,
+                        "slots": []
+                    },
+                    {
+                        "exclude_day":$sch_exclude_day_5,
+                        "slots": []
+                    },
+                    {
+                        "exclude_day":$sch_exclude_day_6,
+                        "slots": []
+                    }
+                ]
+            }
+        },
+        "auto_schedule":$sch_auto,
+        "distance_covered":$distance_covered,
+        "mower_work_time":$mower_work_time,
+        "blade_work_time":$blade_work_time,
+        "blade_work_time_reset":$blade_work_time_reset,
+        "blade_work_time_reset_at":$blade_work_time_reset_at,
+        "battery_charge_cycles":$battery_charge_cycles,
+        "battery_charge_cycles_reset":$battery_charge_cycles_reset,
+        "battery_charge_cycles_reset_at":$battery_charge_cycles_reset_at,
+        "messages_in":$messages_in,
+        "messages_out":$messages_out,
+        "raw_messages_in":$raw_messages_in,
+        "raw_messages_out":$raw_messages_out,
+        "created_at":$created_at,
+        "updated_at":$updated_at
     }
- ]
+]
