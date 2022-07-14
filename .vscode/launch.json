@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run simulator",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/landroid_sim.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
