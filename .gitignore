@@ -4,3 +4,6 @@ __pycache__/
 
 # Custom environment vars
 .env
+
+# HTTP sessions should not be uploaded to GitHub
+.sessions/

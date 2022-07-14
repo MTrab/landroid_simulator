@@ -25,6 +25,9 @@ class ServerBase:
         sys.argv.append(port)
         THIS_VENDOR = vendor
         self.__service = web.application(urls, globals())
+        self.__session = web.session.Session(
+            self.__service, web.session.DiskStore(".sessions")
+        )
 
     def start(self) -> None:
         """Starts the web service"""
