@@ -5,9 +5,22 @@
             "name": "Run simulator",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/landroid_sim.py",
+            "program": "${workspaceFolder}/run.py",
+            "args": [
+                "88"
+            ],
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": [
+                "88"
+            ],
+            "console": "integratedTerminal"
         }
     ]
 }
