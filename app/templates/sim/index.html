@@ -1,0 +1,44 @@
+<html>
+
+<head>
+    <title>Landroid Simulator user login</title>
+</head>
+
+</html>
+
+<body>
+    <h1 align="center">Landroid Simulator user login</h1>
+    <table width="100%" border="0">
+        <tr>
+            <td>
+                <h1>Existing user</h1>
+            </td>
+            <td>
+                <h1>New user</h1>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <form action="/sim/authenticate" method="post" accept-charset="utf-8"
+                    enctype="application/x-www-form-urlencoded">
+                    <table border="0">
+                        <tr>
+                            <td align="right">EMail</td>
+                            <td><input name="email" type="email" id="email"></td>
+                        </tr>
+                        <tr>
+                            <td align="right">Password</td>
+                            <td><input name="password" type="password" id="password"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="center"><input type="submit" name="login" value="Login"></td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+            <td>
+                <input type="button" onclick="location.href='/sim/create';" value="Create an account">
+            </td>
+        </tr>
+    </table>
+</body>
