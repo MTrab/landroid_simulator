@@ -22,6 +22,13 @@ if __name__ == "__main__":
         type=str,
     )
     parser.add_argument(
+        "-m",
+        "--mqtt_port",
+        help="Set port number to be used for the MQTT relay",
+        default="89",
+        type=str,
+    )
+    parser.add_argument(
         "-l",
         "--log_level",
         help="Set lowest loglevel",
@@ -39,16 +46,16 @@ if __name__ == "__main__":
         default=os.path.join(run_path, "log"),
     )
     parser.add_argument(
+        "--database_path",
+        help="Path where database files will be stored",
+        type=str,
+        default=os.path.join(run_path, "app/databases"),
+    )
+    parser.add_argument(
         "--ip",
         help="IP address to listen for requests",
         type=str,
         default="0.0.0.0",
-    )
-    parser.add_argument(
-        "--database_path",
-        help="Where to store the database(s)",
-        type=str,
-        default=os.path.join(run_path, "app/databases"),
     )
 
     config = vars(parser.parse_args())

@@ -3,12 +3,10 @@
 import asyncio
 import logging
 import os
-from typing import Any
-from aiohttp import web
 
+from .__version__ import VersionManager
 from .server import HttpRequestHandler
 from .tools.logger import init_logger
-from .__version__ import VersionManager
 
 
 def main(config: dict):
@@ -48,10 +46,13 @@ def main(config: dict):
     _LOGGER.info("License: %s", ver.license)
     _LOGGER.debug("Saving log files in %s", config["log_path"])
     _LOGGER.debug("Serving templates from %s", config["template_path"])
-    _LOGGER.debug("Databases stored in %s", config["database_path"])
-    _LOGGER.debug("Configuring web service")
+    _LOGGER.info(
+        "Listening for MQTT connections on tcp://%s:%s",
+        config["ip"],
+        config["mqtt_port"],
+    )
 
-    app = HttpRequestHandler(config["port"], config["ip"], config["template_path"])
+    app = HttpRequestHandler(config)
 
     loop = asyncio.get_event_loop()
     try:

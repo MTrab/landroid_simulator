@@ -4,5 +4,14 @@
     "python.pythonPath": "/usr/local/bin/python",
     "python.linting.pylintArgs": [
         "--disable=invalid-name"
-    ]
+    ],
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "Landroid Simulator DB",
+            "database": "/workspace/landroid_simulator/app/databases/landroid_simulator.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
 }

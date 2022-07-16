@@ -1,16 +1,20 @@
 """Authenticate user logins."""
 import hashlib
+import logging
 from aiohttp import web
 import aiohttp_jinja2
 from aiohttp_session import get_session
 
-from app.datasets import Vendor
+from app.tools.database import DatabaseTypes
 
-# from app.datasets import Vendor
+from .dashboard import app as app_dashboard
+
+_LOGGER = logging.getLogger(__name__)
 
 app = web.Application()
+app.add_subapp("/dashboard", app_dashboard)
+
 routes = web.RouteTableDef()
-# aiohttp_jinja2.setup(app,    loader=jinja2.FileSystemLoader('static/sim'))
 
 
 @routes.view("/authenticate")
@@ -28,18 +32,34 @@ class Authenticate(web.View):
         """Data from client."""
         indata = await self.request.post()
 
-        authdb
+        db = self.request.config_dict["database"]
+        authdb = db.connect(DatabaseTypes.USERS)
+        if isinstance(authdb, type(None)):
+            _LOGGER.error(
+                "Could not authorize user, as there was an error opening the database!"
+            )
+            return web.Response(
+                status=500,
+                text="500: Server error - Error opening database connection!",
+            )
+
         pwdhash = hashlib.md5(indata["password"].encode("utf-8")).hexdigest()
-        check = authdb.execute(
-            "select * from users where email=? and password=?",
+        cursor = authdb.cursor()
+        cursor.execute(
+            "select count(*) from users where email=? and password=?",
             (indata["email"], pwdhash),
         )
-        if check:
-            # web.ctx.session.loggedin = True
-            # web.ctx.session.username = indata.username
-            raise web.HTTPFound("/sim")
+        data = cursor.fetchone()[0]
+        authdb.close()
+
+        if data == 0:
+            return web.Response(status=403, text="403: Unauthorized")
         else:
-            return "Those login details don't work!"
+            session = await get_session(self.request)
+            session["loggedin"] = True
+            session["email"] = indata["email"]
+            session.max_age = 5 * 60
+            raise web.HTTPFound("/sim")
 
 
 @routes.view("/")
@@ -50,9 +70,11 @@ class Root(web.View):
     @aiohttp_jinja2.template("sim/index.html")
     async def get(self):
         """Return some test data."""
-        return {}
+        session = await get_session(self.request)
+        if ("loggedin" in session) and session["loggedin"]:
+            raise web.HTTPFound("/sim/dashboard")
 
-    #     return web.Response(text="Test")  # render.index()
+        return {}
 
 
 @routes.view("/lostpass")

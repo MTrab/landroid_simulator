@@ -4,13 +4,14 @@ import base64
 import logging
 import ssl
 
-from aiohttp import web
+from aiohttp import ClientSession, web
 import aiohttp_jinja2
 from aiohttp_session import setup as setup_session
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 from cryptography import fernet
 import jinja2
 
+from .tools.database import Database
 from .urlhandlers import *
 
 
@@ -18,23 +19,45 @@ class HttpRequestHandler:
     """HTTP handler."""
 
     def __init__(
-        self, port: str, ip_address: str, template_path: str, keep_alive=75, **kwargs
+        self,
+        config: dict,
+        keep_alive: int = 75,
+        **kwargs,
     ) -> None:
         """Initialize the web server."""
 
-        self._port = port
-        self._ip = ip_address
-        self._dir = template_path
+        self._config = config
+        self._port = config["port"]
+        self._ip = config["ip"]
+        self._dir = config["template_path"]
         self._logger = logging.getLogger(__name__)
         self._runner: web.AppRunner
 
     async def handle_root(self, request):
         """Handle an incoming request."""
-        raise web.HTTPFound("/sim")
+        return web.Response(text="Nothing here yet!")
+
+    # async def handle_proxy(self, request):
+    #     """Forward incoming requests."""
+    #     url = f"https://api.worxlandroid.com{request.path_qs}"
+    #     print(url)
+    #     async with ClientSession() as client:
+    #         async with client.request(
+    #             method=request.method,
+    #             url=url,
+    #             verify_ssl=False,
+    #             headers=request.headers,
+    #         ) as resp:
+    #             assert resp.status == 200
+    #         data = await resp.text()
+
+    #     return web.Response(text=data)
 
     async def start(self):
         """Start the service."""
         app = web.Application()
+
+        app["database"] = Database(self._config["database_path"])
 
         fernet_key = fernet.Fernet.generate_key()
         secret_key = base64.urlsafe_b64decode(fernet_key)
@@ -46,13 +69,9 @@ class HttpRequestHandler:
         app.add_subapp("/sim", app_sim)
         app.add_subapp("/api/v2", app_api)
 
+        # app.add_routes([web.route("*", "/{tail:.*}", self.handle_proxy)])
+
         aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(self._dir))
-        # middleware = SnareMiddleware(
-        #     error_404=self.meta["/status_404"].get("hash"),
-        #     headers=self.meta["/status_404"].get("headers", []),
-        #     server_header=self.run_args.server_header,
-        # )
-        # middleware.setup_middlewares(app)
 
         self._runner = web.AppRunner(app)
         await self._runner.setup()
@@ -66,7 +85,9 @@ class HttpRequestHandler:
         site = web.TCPSite(self._runner, self._ip, self._port, ssl_context=ssl_context)
 
         await site.start()
-        self._logger.info("Listening on https://%s:%s", self._ip, self._port)
+        self._logger.info(
+            "Listening for web requests on https://%s:%s", self._ip, self._port
+        )
 
     async def stop(self):
         """Stop the service."""
