@@ -28,7 +28,7 @@ class Authenticate(web.View):
         """Data from client."""
         indata = await self.request.post()
 
-        
+        authdb
         pwdhash = hashlib.md5(indata["password"].encode("utf-8")).hexdigest()
         check = authdb.execute(
             "select * from users where email=? and password=?",

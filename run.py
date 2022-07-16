@@ -44,6 +44,12 @@ if __name__ == "__main__":
         type=str,
         default="0.0.0.0",
     )
+    parser.add_argument(
+        "--database_path",
+        help="Where to store the database(s)",
+        type=str,
+        default=os.path.join(run_path, "app/databases"),
+    )
 
     config = vars(parser.parse_args())
     config.update({"template_path": os.path.join(run_path, "app/templates")})

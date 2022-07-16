@@ -48,6 +48,7 @@ def main(config: dict):
     _LOGGER.info("License: %s", ver.license)
     _LOGGER.debug("Saving log files in %s", config["log_path"])
     _LOGGER.debug("Serving templates from %s", config["template_path"])
+    _LOGGER.debug("Databases stored in %s", config["database_path"])
     _LOGGER.debug("Configuring web service")
 
     app = HttpRequestHandler(config["port"], config["ip"], config["template_path"])
