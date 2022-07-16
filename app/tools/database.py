@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS users (
 );
 """,
         "default": """
-INSERT INTO users (email,password,fullname)
-VALUES ("none@none.none","f3812cd46d0efc3da4f5998bbab3ab70","Admin");
+INSERT INTO users (email,password,fullname,admin)
+VALUES ("none@none.none","f3812cd46d0efc3da4f5998bbab3ab70","Admin",1);
 """,
     }
 
