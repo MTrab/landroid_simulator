@@ -10,4 +10,4 @@ This is mainly created to aid in developing [pyWorxcloud](https://pypi.org/proje
 
 _!! Currently there are **NO** documentation available, as this is in a pure development stage at the moment !!_
 
-## If you have experience in creating great looking UI's, then please contact me at **landroid-sim (a) trab.dk**
+## If you have experience in creating great looking UI's, then please contact me at <ins>**landroid-sim (a) trab.dk**</ins>
