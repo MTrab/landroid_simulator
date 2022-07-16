@@ -7,7 +7,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/run.py",
             "args": [
-                "88"
+                "-l",
+                "debug"
             ],
             "console": "integratedTerminal",
             "justMyCode": true
@@ -17,9 +18,6 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "args": [
-                "88"
-            ],
             "console": "integratedTerminal"
         }
     ]
