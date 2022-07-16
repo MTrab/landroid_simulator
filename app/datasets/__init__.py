@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import Enum
 import os
 
+from dataclasses_json import DataClassJsonMixin
+
 BASE = os.path.abspath(os.path.dirname(__file__))
 
 ATTR_NAME = "name"
@@ -15,7 +17,7 @@ ATTR_URL_BOARDS = "url_boards"
 
 
 @dataclass
-class DatasetDescription:
+class DatasetDescription(DataClassJsonMixin):
     """Dataset descriptor."""
 
     name: str
@@ -72,6 +74,6 @@ class Dataset:
 
         return data
 
-    def fetch(self, url: str) -> str:
-        """Fetch URL resource"""
-        request.get
+    # def fetch(self, url: str) -> str:
+    #     """Fetch URL resource"""
+    #     request.get
