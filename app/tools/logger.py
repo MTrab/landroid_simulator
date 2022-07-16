@@ -1,66 +1,89 @@
 """Logger definitions."""
 import logging
 import logging.handlers
+import queue
+
+from logging.handlers import QueueHandler, QueueListener, TimedRotatingFileHandler
+from typing import Any
+
+from ansi2html import Ansi2HTMLConverter
+
+logger = logging.getLogger()
 
 
-class LevelFilter(logging.Filter):
-    """Filters (lets through) all messages with level < LEVEL"""
+def log_to_html(log_file: str):
+    """Convert ANSI log to HTML."""
+    with open(log_file, mode="r", encoding="UTF-8") as log:
+        content = log.read()
 
-    def __init__(self, level):
-        self.level = level
-
-    def filter(self, record):
-        return record.levelno < self.level
-
-    # "<" instead of "<=": since logger.setLevel is inclusive, this should be exclusive
+    conv = Ansi2HTMLConverter()
+    return conv.convert(content)
 
 
-class Logger:
-    """Landroid logger class."""
+def init_logger(
+    log_file: str, rotate_days: int | None = None, loglevel: Any = logging.INFO
+) -> None:
+    """Initialize the logger."""
+    fmt = "%(asctime)s | %(levelname)8s | %(message)s"
+    datefmt = "%Y-%m-%d %H:%M:%S"
+    # logging.basicConfig(format=fmt, level=logging.INFO, datefmt=datefmt)
+    global logger
+    logger.setLevel(loglevel)
 
-    @staticmethod
-    def create_logger(debug_filename, err_filename, logger_name):
-        """Create a logger."""
-        logger = logging.getLogger(logger_name)
-        logger.setLevel(logging.DEBUG)
-        logger.propagate = False
-        formatter = logging.Formatter(
-            fmt="%(asctime)s %(levelname)s:%(name)s:%(funcName)s: %(message)s",
-            datefmt="%d-%m-%Y %H:%M:%S",
+    # stdout logger
+    stdout_handler = logging.StreamHandler()
+    stdout_handler.setLevel(loglevel)
+    stdout_handler.setFormatter(ColorLogger(fmt=fmt, datefmt=datefmt))
+
+    # File logger
+    file_handler: logging.handlers.RotatingFileHandler | logging.handlers.TimedRotatingFileHandler
+    if rotate_days:
+        file_handler = logging.handlers.TimedRotatingFileHandler(
+            log_file, when="midnight", backupCount=rotate_days
         )
+    else:
+        file_handler = logging.handlers.RotatingFileHandler(log_file, backupCount=1)
 
-        # ERROR log
-        error_log_handler = logging.handlers.RotatingFileHandler(
-            err_filename, encoding="utf-8"
-        )
-        error_log_handler.setLevel(logging.ERROR)
-        error_log_handler.setFormatter(formatter)
-        logger.addHandler(error_log_handler)
+    file_handler.doRollover()
 
-        # DEBUG log
-        debug_log_handler = logging.handlers.RotatingFileHandler(
-            debug_filename, encoding="utf-8"
-        )
-        debug_log_handler.setLevel(logging.DEBUG)
-        debug_log_handler.setFormatter(formatter)
-        max_level_filter = LevelFilter(logging.ERROR)
-        debug_log_handler.addFilter(max_level_filter)
-        logger.addHandler(debug_log_handler)
+    file_handler.setLevel(loglevel)
+    file_handler.setFormatter(logging.Formatter(fmt=fmt, datefmt=datefmt))
 
-        return logger
+    # Queue handler
+    que = queue.Queue(-1)  # no limit on size
+    queue_handler = QueueHandler(que)
+    listener = QueueListener(que, file_handler, stdout_handler)
 
-    @staticmethod
-    def create_clone_logger(log_filename, logger_name):
-        """Clone a logger."""
-        logger = logging.getLogger(logger_name)
-        formatter = logging.Formatter(
-            fmt="%(asctime)s %(levelname)s:%(name)s:%(funcName)s: %(message)s",
-            datefmt="%d-%m-%Y %H:%M:%S",
-        )
-        # logs to 'clone.err'
-        debug_log_handler = logging.handlers.RotatingFileHandler(
-            log_filename, encoding="utf-8"
-        )
-        debug_log_handler.setLevel(logging.DEBUG)
-        debug_log_handler.setFormatter(formatter)
-        logger.addHandler(debug_log_handler)
+    logger.addHandler(queue_handler)
+
+    listener.start()
+
+
+class ColorLogger(logging.Formatter):
+    """Logging colored formatter, adapted from https://stackoverflow.com/a/56944256/3638629"""
+
+    grey = "\x1b[38;21m"
+    blue = "\x1b[38;5;39m"
+    yellow = "\x1b[38;5;226m"
+    red = "\x1b[38;5;196m"
+    bold_red = "\x1b[31;1m"
+    reset = "\x1b[0m"
+    cyan = "\x1b[96m"
+    green = "\x1b[92m"
+
+    def __init__(self, fmt, datefmt):
+        super().__init__()
+        self.fmt = fmt
+        self.datefmt = datefmt
+        self.FORMATS = {
+            logging.DEBUG: self.cyan + self.fmt + self.reset,
+            logging.INFO: self.green + self.fmt + self.reset,
+            logging.WARNING: self.yellow + self.fmt + self.reset,
+            logging.ERROR: self.red + self.fmt + self.reset,
+            logging.CRITICAL: self.bold_red + self.fmt + self.reset,
+        }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt)
+        return formatter.format(record)
