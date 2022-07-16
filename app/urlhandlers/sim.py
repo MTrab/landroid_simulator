@@ -1,78 +1,76 @@
 """Authenticate user logins."""
 import hashlib
-import os
-import sqlite3
-import web
+from aiohttp import web
+import aiohttp_jinja2
+from aiohttp_session import get_session
 
 from app.datasets import Vendor
 
-app = web.auto_application()
+# from app.datasets import Vendor
 
-# render = web.template.render("static/sim/")
-# print(render.index())
+app = web.Application()
+routes = web.RouteTableDef()
+# aiohttp_jinja2.setup(app,    loader=jinja2.FileSystemLoader('static/sim'))
 
 
-class Authenticate(app.page):
+@routes.view("/authenticate")
+class Authenticate(web.View):
     """Authentication class."""
 
-    path = "/authenticate"
+    # async def get(self):
+    #     """For testing purposes only."""
+    #     session = await get_session(self.request)
+    #     # if not "vendor" in session:
+    #     session["vendor"] = Vendor.WORX.to_json()
+    #     return web.Response(text="Testing authenticate get")
 
-    def GET(self):
-        """For testing purposes only."""
-        web.ctx.session.vendor = Vendor.WORX
-
-    def POST(self):
+    async def post(self):
         """Data from client."""
-        indata = web.input()
+        indata = await self.request.post()
 
-        authdb = sqlite3.connect("users.db")
-        pwdhash = hashlib.md5(indata.password).hexdigest()
+        
+        pwdhash = hashlib.md5(indata["password"].encode("utf-8")).hexdigest()
         check = authdb.execute(
-            "select * from users where username=? and password=?",
-            (indata.username, pwdhash),
+            "select * from users where email=? and password=?",
+            (indata["email"], pwdhash),
         )
         if check:
             # web.ctx.session.loggedin = True
             # web.ctx.session.username = indata.username
-            raise web.seeother("/sim")
+            raise web.HTTPFound("/sim")
         else:
             return "Those login details don't work!"
 
 
-class root(app.page):
+@routes.view("/")
+@routes.view("")
+class Root(web.View):
     """Root simulator page."""
 
-    path = "/"
-
-    def GET(self):
+    @aiohttp_jinja2.template("sim/index.html")
+    async def get(self):
         """Return some test data."""
-        return "Test"  # render.index()
+        return {}
+
+    #     return web.Response(text="Test")  # render.index()
 
 
-class alt_root(root):
-    """Used for accessing without / :)"""
-
-    path = ""
-
-
-class ForgotPassword(app.page):
+@routes.view("/lostpass")
+class ForgotPassword(web.View):
     """Class for handling forgotten passwords."""
 
-    path = "/lostpass"
-
-    def GET(self):
+    async def get(self):
         """Return some test data."""
-        return "Lost password"
+        return web.Response(text="Lost password")
 
 
-class CreateUser:
+@routes.view("/create")
+class CreateUser(web.View):
     """Class for creating users."""
 
-    path = "/create"
-
-    def GET(self):
+    async def get(self):
         """Return some test data."""
-        return "Create user"
+        return web.Response(text="Create user")
 
 
-# app = web.application(urls, locals())
+app.add_routes(routes)

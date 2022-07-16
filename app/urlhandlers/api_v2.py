@@ -1,57 +1,97 @@
 """Generic API-v2 handler."""
-import web
 
-from ..datasets import Dataset
+import logging
+from aiohttp import web
+from aiohttp_session import get_session
 
-web.config.debug = False
-app = web.auto_application()
+from ..datasets import Dataset, DatasetDescription
+
+app = web.Application()
+routes = web.RouteTableDef()
+
+_LOGGER = logging.getLogger(__name__)
 
 
-class productitems(app.page):
+@routes.view("/product-items")
+class productitems(web.View):
     """Handling users products."""
 
-    path = "/product_items"
-
-    def GET(self) -> str:
+    async def get(self) -> str:
         """Return a test string."""
         return "User data"
 
 
-class products(app.page):
+@routes.view("/products")
+class products(web.View):
     """Handling all products information."""
 
-    path = "/products"
-
-    def GET(self) -> str:
+    async def get(self) -> str:
         """Return products info."""
-        if not "vendor" in web.ctx.session:
-            raise web.seeother("/sim/authenticate", True)
+        session = await get_session(self.request)
+        if not "vendor" in session:
+            raise web.HTTPFound("/sim/authenticate")
 
-        dataset = Dataset(web.ctx.session.vendor)
+        vendor = DatasetDescription.from_json(session["vendor"])
+        dataset = Dataset(vendor)
 
-        return dataset.load(dataset.vendor.products_file)
+        return web.Response(text=dataset.load(vendor.products_file))
 
 
-class boards(app.page):
+@routes.view("/boards")
+class boards(web.View):
     """Handling all boards information."""
 
-    path = "/boards"
-
-    def GET(self) -> str:
+    async def get(self) -> str:
         """Return boards info."""
-        if not "vendor" in web.ctx.session:
-            raise web.seeother("/sim/authenticate", True)
+        session = await get_session(self.request)
+        if not "vendor" in session:
+            raise web.HTTPFound("/sim/authenticate")
 
-        dataset = Dataset(web.ctx.session.vendor)
+        vendor = DatasetDescription.from_json(session["vendor"])
+        dataset = Dataset(vendor)
 
-        return dataset.load(dataset.vendor.boards_file)
+        return web.Response(text=dataset.load(vendor.boards_file))
 
 
-class productstatus(app.page):
+@routes.view("/product-items/(.*)/status")
+class productstatus(web.View):
     """Handling device status information."""
 
-    path = "/product-items/(.*)/status"
-
-    def GET(self, serial) -> str:
+    async def get(self, serial) -> str:
         """Return a test string."""
         return f"This is device status for {serial}"
+
+
+@routes.view("/oauth/token")
+class token(web.View):
+    """Return token."""
+
+    async def post(self) -> str:
+        """Receive data."""
+        token_data = {
+            "access_token": "TestToken",
+            "token_type": "Test",
+            "mqtt_endpoint": "omv.trab.dk:1234",
+        }
+        return web.json_response(token_data)
+
+
+@routes.view("/me")
+class me(web.View):
+    """Handling user info."""
+
+    async def get(self) -> str:
+        """Return a test string."""
+        return "User data"
+
+
+@routes.view("/certificate")
+class certificate(web.View):
+    """Handling user certificate."""
+
+    async def get(self) -> str:
+        """Return a test string."""
+        return "Certificate data"
+
+
+app.add_routes(routes)
