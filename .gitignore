@@ -8,4 +8,5 @@ __pycache__/
 # HTTP sessions should not be uploaded to GitHub
 .sessions/
 log/
+databases/
 users.db
