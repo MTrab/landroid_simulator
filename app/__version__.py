@@ -1,5 +1,13 @@
 """App version."""
 
-app_version = "0.0.1-dev"
-app_author = "Malene Trab (https://github.com/mtrab)"
-app_license = "GPL-3.0"
+import logging
+
+
+class VersionManager:
+    """Version manager."""
+
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.version = "0.0.1-dev"
+        self.author = "Malene Trab (https://github.com/mtrab)"
+        self.license = "GPL-3.0"
