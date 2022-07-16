@@ -4,6 +4,8 @@ from aiohttp import web
 import aiohttp_jinja2
 from aiohttp_session import get_session
 
+from app.tools.database import Database, UserInfo
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -13,6 +15,9 @@ async def check_session(request, handler):
     session = await get_session(request)
     if (not "loggedin" in session) or not session["loggedin"]:
         raise web.HTTPFound("/sim")
+
+    db: Database = request.config_dict["database"]
+    session["userdata"] = db.get_userinfo(session["email"])
 
     response = await handler(request)
     return response
@@ -31,8 +36,8 @@ class Authenticate(web.View):
     async def get(self):
         """Show basic dashboard."""
         session = await get_session(self.request)
-
-        return {"email": session["email"]}
+        # userdata = UserInfo.from_json(session["userdata"])
+        return UserInfo.from_json(session["userdata"]).to_dict()
 
 
 app.add_routes(routes)

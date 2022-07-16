@@ -1,14 +1,26 @@
 """Database handler"""
 
-from enum import Enum
+import hashlib
 import logging
-
 import os
-from pathlib import Path
 import sqlite3
-from typing import Any
+from dataclasses import dataclass
+from enum import Enum
+from pathlib import Path
+
+from dataclasses_json import DataClassJsonMixin
 
 _LOGGER = logging.getLogger(__name__)
+
+
+@dataclass
+class UserInfo(DataClassJsonMixin):
+    """Holds userinformation"""
+
+    user_id: int
+    email: str
+    fullname: str
+    admin: bool = False
 
 
 class DatabaseTypes(Enum):
@@ -22,8 +34,7 @@ CREATE TABLE IF NOT EXISTS users (
     email text NOT NULL,
     password text NOT NULL,
     fullname text,
-    admin tinyint(1) NOT NULL DEFAULT 0,
-
+    admin tinyint(1) NOT NULL DEFAULT 0
 );
 """,
         "default": """
@@ -67,6 +78,67 @@ class Database:
 
             return None
 
+    def get_userinfo(self, email: str) -> str:
+        """Returns UserInfo object holding users information."""
+        db = self.connect(DatabaseTypes.USERS)
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+        data = cursor.fetchone()
+        user = UserInfo(
+            user_id=int(data[0]),
+            email=data[1],
+            fullname=data[3],
+            admin=bool(data[4]),
+        )
+        cursor.close()
+        db.close()
+        return user.to_json()
+
+    def user_exist(self, email: str) -> bool:
+        """Check if user exists in database
+
+        Args:
+            email (str): User email
+
+        Returns:
+            bool: Returns True if the email is found in the database
+        """
+        db = self.connect(DatabaseTypes.USERS)
+        cursor = db.cursor()
+        cursor.execute(
+            "SELECT COUNT(*) FROM users WHERE email=?",
+            (email,),
+        )
+        data = cursor.fetchone()[0]
+        cursor.close()
+        db.close()
+
+        return bool(data)
+
+    def save_user(self, user_data: dict) -> bool:
+        """Save user in database."""
+        try:
+            db = self.connect(DatabaseTypes.USERS)
+            cursor = db.cursor()
+            cursor.execute(
+                "INSERT INTO users (email,password,fullname,admin) VALUES (?,?,?,0)",
+                (
+                    user_data["email"],
+                    self.hash_password(user_data["password"]),
+                    user_data["name"],
+                ),
+            )
+            self._conn.commit()
+            cursor.close()
+            db.close()
+            return True
+        except:  # pylint: disable=bare-except
+            return False
+
+    def hash_password(self, password) -> str:
+        """Hash password for database encryption."""
+        return hashlib.md5(password.encode("utf-8")).hexdigest()
+
     def cursor(self) -> sqlite3.Cursor:
         """Return a SQLite cursor."""
         return self._conn.cursor()
@@ -81,5 +153,5 @@ class Database:
                 "Adding default data to the database. %s", database.value["default"]
             )
             cursor.execute(database.value["default"])
-
         self._conn.commit()
+        cursor.close()

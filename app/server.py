@@ -4,7 +4,7 @@ import base64
 import logging
 import ssl
 
-from aiohttp import ClientSession, web
+from aiohttp import web
 import aiohttp_jinja2
 from aiohttp_session import setup as setup_session
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
